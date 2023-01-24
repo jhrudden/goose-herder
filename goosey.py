@@ -11,7 +11,15 @@ while(True):
     img = cv2.resize(img, (1920, 1080))
     cv2.imshow('Image', img)
 
-    if cv2.waitKey(1)& 0xFF == ord('q'):
+    # Handle key press
+    key = cv2.waitKey(1) & 0xFF
+    
+
+    if key == ord('q'):
         break
+    
+    # Control tello with keyboard
+    tc.handle_key(key)
+
 tc.end()
 cv2.destroyAllWindows()
