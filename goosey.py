@@ -12,10 +12,10 @@ while(True):
     cv2.imshow('Image', img)
 
     # Handle key press
-    key = cv2.waitKey(1) & 0xFF
+    key = cv2.waitKey(100) & 0xFF
     
 
-    if key == ord('q'):
+    if key == 27:
         break
     
     # Control tello with keyboard

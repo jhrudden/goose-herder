@@ -8,6 +8,7 @@ class TelloController:
     def __init__(self):
         self.tello = Tello()
         self.tello.connect()
+        self.tello.takeoff()
     
     def start_stream(self):
         '''Turns on tello stream settings and returns frame stream'''
@@ -31,6 +32,7 @@ class TelloController:
 
 
     def end(self):
+        self.tello.land()
         self.tello.streamoff()
     
 
