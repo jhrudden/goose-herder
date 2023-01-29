@@ -6,17 +6,21 @@ import time
 
 # CONSTANTS
 DRONE_SPEED = 60
-FPS = 80
+FPS = 120
+
 
 class TelloController: 
     """Creates a display of tello video stream and moves drone via key events
        Escape key -> quits
        Controls:
-          - T: 
+          - T: Takeoff
           - L: Land
           - Arrow keys: Forward, backward, left and right.
           - A and D: Counter clockwise and clockwise rotations (yaw)
           - W and S: Up and down.
+
+        # Reference: https://github.com/damiafuentes/DJITelloPy/blob/master/examples/manual-control-pygame.py
+
     """
     def __init__(self):
         pygame.init()
@@ -60,10 +64,13 @@ class TelloController:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     # Handle keydown
-                    raise NotImplementedError()
+                    if event.type == pygame.K_ESCAPE:
+                        running = False
+                    else:
+                        self.keydown(event.key)
                 elif event.type == pygame.KEYUP:
                     # Handle keyup
-                    raise NotImplementedError()
+                    self.keyup(event.key)
             
             # Ensure no issue has occurred with video stream from drone
             if frame_read.stopped:
@@ -85,6 +92,8 @@ class TelloController:
 
             self.screen.blit(frame, (0,0))
 
+            pygame.display.update()
+
             time.sleep(1 / FPS)
 
         self.tello.end()
@@ -95,19 +104,53 @@ class TelloController:
         if self.send_rc_control:
             self.tello.send_rc_control(self.x_v, self.z_v, self.y_v, self.yaw_v)
 
+    def keydown(self, key):
+            """ Update velocities based on key pressed
+            Arguments:
+                key: pygame key
+            """
+            if key == pygame.K_UP:  # set forward velocity
+                self.z_v = DRONE_SPEED
+            elif key == pygame.K_DOWN:  # set backward velocity
+                self.z_v = -DRONE_SPEED
+            elif key == pygame.K_LEFT:  # set left velocity
+                self.x_v = -DRONE_SPEED
+            elif key == pygame.K_RIGHT:  # set right velocity
+                self.x_v = DRONE_SPEED
+            elif key == pygame.K_w:  # set up velocity
+                self.y_v = DRONE_SPEED
+            elif key == pygame.K_s:  # set down velocity
+                self.y_v = -DRONE_SPEED
+            elif key == pygame.K_a:  # set yaw counter clockwise velocity
+                self.yaw_v = -DRONE_SPEED
+            elif key == pygame.K_d:  # set yaw clockwise velocity
+                self.yaw_v = DRONE_SPEED
 
+    def keyup(self, key):
+        """ Update velocities based on key released
+        Arguments:
+            key: pygame key
+        """
+        if key == pygame.K_UP or key == pygame.K_DOWN:  # set zero forward/backward velocity
+            self.z_v = 0
+        elif key == pygame.K_LEFT or key == pygame.K_RIGHT:  # set zero left/right velocity
+            self.x_v = 0
+        elif key == pygame.K_w or key == pygame.K_s:  # set zero up/down velocity
+            self.y_v = 0
+        elif key == pygame.K_a or key == pygame.K_d:  # set zero yaw velocity
+            self.yaw_v = 0
+        elif key == pygame.K_t:  # takeoff
+            self.tello.takeoff()
+            self.send_rc_control = True
+        elif key == pygame.K_l:  # land
+            not self.tello.land()
+            self.send_rc_control = False
 
 
     def start_stream(self):
         '''Turns on tello stream settings and returns frame stream'''
         self.tello.streamon()
         return self.tello.get_frame_read()
-
-
-    def end(self):
-        self.tello.land()
-        self.tello.streamoff()
-    
 
 
 if __name__ == "__main__":
