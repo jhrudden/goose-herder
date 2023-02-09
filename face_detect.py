@@ -8,7 +8,7 @@ def detect_face(frame):
     faces = face_cascade.detectMultiScale(frame_grey)
     for (x, y, w, h) in faces:
         center = (x + w//2, y + h//2)
-        frame = cv2.rectangle(frame, [x, y], [w, h], (255, 0, 0), 2)
+        frame = cv2.rectangle(frame, [x, y], [x+w, y+h], (255, 0, 0), 2)
     cv2.imshow('frame', frame)
 
 
@@ -31,5 +31,5 @@ if __name__ == '__main__':
         ret, frame = video_capture.read()
         detect_face(frame)
 
-        if cv2.waitKey(0) & 0xFF == ord('q'):
+        if cv2.waitKey(30) & 0xFF == ord('q'):
             break
