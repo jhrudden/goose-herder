@@ -8,3 +8,9 @@
 ### Notice
 
 If recieving `imu` errors, then cameras aren't getting enough light
+
+### Distance Calculation
+
+Focal length of camera ~= 3 mm
+
+Use pinhole camera model for determining distance: https://en.wikipedia.org/wiki/Pinhole_camera_model
