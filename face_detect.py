@@ -1,11 +1,13 @@
 import cv2
 
 MAC_M1_FOCAL_LENGTH = 50.0  # in millimeters
-JH_FACE_HEIGHT = 209.55 # in millimeters
+JH_FACE_WIDTH = 135.0 # in millimeters
 
+# TODO: ratio seems off ...
 # Referenced: https://photo.stackexchange.com/questions/12434/how-do-i-calculate-the-distance-of-an-object-in-a-photo
-def calculate_distance(image_height: float, known_object_height: float, current_height: float, focal_length: float = MAC_M1_FOCAL_LENGTH ) -> float:
-    return (focal_length * known_object_height) / current_height
+def calculate_distance(known_object_width: float, observed_width: float, focal_length: float = MAC_M1_FOCAL_LENGTH ) -> float:
+    # TODO: need to use width instead of height
+    return (focal_length * known_object_width) / observed_width
 
 
 class FaceDetector:
@@ -19,12 +21,9 @@ class FaceDetector:
     
     def draw_face_distance(self, frame, face):
         (x, y, w, h) = face
-        face_height_in_frame = abs(y - h)
-        print(f'height camera {face_height_in_frame}')
-        img_height = frame.shape[0]
-        dist = calculate_distance(img_height, JH_FACE_HEIGHT, face_height_in_frame)
-        dist_ft = int(dist * 0.00328084)
-        return cv2.putText(frame, f'{str(dist_ft)}ft', [x + (w // 2), y + (h // 2)], cv2.FONT_HERSHEY_SIMPLEX,
+        print(f'camera width {w}')
+        dist = calculate_distance(JH_FACE_WIDTH, w)
+        return cv2.putText(frame, f'{str(dist)}mm', [x + (w // 2), y + (h // 2)], cv2.FONT_HERSHEY_SIMPLEX,
             1, (255, 0, 0), 2, cv2.LINE_AA)
         
     def draw_faces(self, frame, faces):
